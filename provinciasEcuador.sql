@@ -1,5 +1,9 @@
 DROP TABLE IF EXISTS provinciasEcuador;
 
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+SET character_set_connection=utf8mb4;
+
 CREATE TABLE provinciasEcuador (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100),
