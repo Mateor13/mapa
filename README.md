@@ -1,6 +1,12 @@
-# Sistema Flask con Load Balancer
+# 🌐 Sistema Flask con Load Balancer
 
 Sistema simple con 2 servidores Flask y balanceador de carga NGINX.
+
+## 👥 Autores
+
+- **García Mireya**
+- **Torres Mateo**
+
 
 ## 🚀 Ejecución rápida
 
