@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mapa de Ecuador - Provincias desde DB</title>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body { margin: 0; font-family: sans-serif;}
+    h1 {font-size: 28px;text-align: center;margin: 10px 0;}
+    h2 {font-size: 18px;text-align: center;margin: 0 0 10px 0;font-weight: normal;}
+    #tabla {padding: 10px;background: #525252;display: flex;flex-wrap: wrap;gap: 10px;}
+    .prov {background: #aeaeae;padding: 6px 12px;border-radius: 6px;cursor: pointer;}
+    .prov:hover {background: #c9c9c9;}
+    #map {height: calc(100vh - 130px);}
+  </style>
+</head>
+<body>
+
+<h1>Servidor 1</h1>
+<h2>Integrantes: García Mireya y Torres Mateo</h2>
+
+<div id="tabla">Cargando provincias...</div>
+<div id="map"></div>
+
+<script>
+  mapboxgl.accessToken = 'pk.eyJ1IjoibWlyZXlhMTExIiwiYSI6ImNtNHYzdWlkdzAxZHYya29yMXRzamR4dW8ifQ.zZ9To5ALiZexkgkc73iZpg';
+
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/light-v10',
+    center: [-78.1834, -1.8312], // Ecuador centro
+    zoom: 6
+  });
+
+  let marcadorActual = null;
+
+  // 1️⃣ Cargar provincias desde la API Flask
+  fetch('/api/provincias')
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) return alert("Error al obtener provincias");
+      const tabla = document.getElementById("tabla");
+      tabla.innerHTML = "";
+      data.provincias.forEach(prov => {
+        const btn = document.createElement("div");
+        btn.className = "prov";
+        btn.textContent = prov.nombre;
+        btn.onclick = () => mostrarProvinciaEnMapa(prov);
+        tabla.appendChild(btn);
+      });
+    });
+
+  // 2️⃣ Mostrar marcador + popup + centrar el mapa
+  function mostrarProvinciaEnMapa(provincia) {
+    const coords = [provincia.longitud, provincia.latitud];
+
+    // Eliminar marcador anterior si existe
+    if (marcadorActual) {
+      marcadorActual.remove();
+    }
+
+    // Crear nuevo marcador
+    marcadorActual = new mapboxgl.Marker({ color: "#FF5733" })
+      .setLngLat(coords)
+      .addTo(map);
+
+    // Crear popup
+    const popup = new mapboxgl.Popup({ offset: 25 })
+      .setHTML(`
+        <strong>${provincia.nombre}</strong><br>
+        Capital: ${provincia.capital}<br>
+        Área: ${provincia.area} km²<br>
+        Población: ${provincia.poblacion.toLocaleString()}
+      `);
+
+    // Asociar popup al marcador
+    marcadorActual.setPopup(popup).togglePopup();
+
+    // Centrar mapa
+    map.flyTo({ center: coords, zoom: 8 });
+  }
+</script>
+
+</body>
+</html>
+
